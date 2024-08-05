@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -9,19 +8,36 @@ import (
 	xj "github.com/basgys/goxml2json"
 )
 
+// convert reads xml from r and encodes it as json to w
+func convert(r io.Reader, w io.Writer) error {
+	var root xj.Node
+	if err := xj.NewDecoder(r).Decode(&root); err != nil {
+		return err
+	}
+	return xj.NewEncoder(w).Encode(&root)
+}
+
 func main() {
-	input, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		fmt.Println(err.Error())
+
+	if len(os.Args) == 1 {
+		if err := convert(os.Stdin, os.Stdout); err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
-	j, err := xj.Convert(bytes.NewReader(input))
+
+	f, err := os.Open(os.Args[1])
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return
 	}
-	if _, err := io.Copy(os.Stdout, j); err != nil {
-		fmt.Println(err.Error())
-		return
+	defer func() {
+		if err := f.Close(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	if err := convert(f, os.Stdout); err != nil {
+		fmt.Println(err)
 	}
 }
