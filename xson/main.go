@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -18,27 +18,27 @@ func convert(r io.Reader, w io.Writer) error {
 	return xj.NewEncoder(w).Encode(&root)
 }
 
-func main() {
-
+func reader() io.ReadCloser {
 	if len(os.Args) == 1 {
-		if err := convert(os.Stdin, os.Stdout); err != nil {
-			fmt.Println(err)
-		}
-		return
+		return os.Stdin
 	}
-
 	f, err := os.Open(strings.TrimSpace(os.Args[1]))
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalf("open input file %q: %v", os.Args[1], err)
 	}
+	return f
+}
+
+func main() {
+
+	r := reader()
 	defer func() {
-		if err := f.Close(); err != nil {
-			fmt.Println(err)
+		if err := r.Close(); err != nil {
+			log.Fatalf("close input stream: %v", err)
 		}
 	}()
 
-	if err := convert(f, os.Stdout); err != nil {
-		fmt.Println(err)
+	if err := convert(r, os.Stdout); err != nil {
+		log.Fatalf("convert xml: %v", err)
 	}
 }
