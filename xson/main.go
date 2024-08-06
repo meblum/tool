@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	xj "github.com/basgys/goxml2json"
 )
@@ -26,7 +27,7 @@ func main() {
 		return
 	}
 
-	f, err := os.Open(os.Args[1])
+	f, err := os.Open(strings.TrimSpace(os.Args[1]))
 	if err != nil {
 		fmt.Println(err)
 		return
