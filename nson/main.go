@@ -6,21 +6,26 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/mattn/go-isatty"
 )
 
 func reader() io.ReadCloser {
-	if len(os.Args) == 1 {
+	istty := isatty.IsTerminal(os.Stdin.Fd()) || isatty.IsCygwinTerminal(os.Stdin.Fd())
+	if !istty {
 		return os.Stdin
+	}
+	if len(os.Args) < 2 {
+		log.Fatal("input not provided")
 	}
 	f, err := os.Open(strings.TrimSpace(os.Args[1]))
 	if err != nil {
-		log.Fatalf("open input file %q: %v", os.Args[1], err)
+		log.Fatalf("open file: %v", err)
 	}
 	return f
 }
 
 func main() {
-
 	r := reader()
 	defer func() {
 		if err := r.Close(); err != nil {
@@ -31,7 +36,7 @@ func main() {
 	// Unmarshal JSON into a dynamic structure
 	var jsonData interface{}
 	if err := json.NewDecoder(r).Decode(&jsonData); err != nil {
-		log.Fatalf("unmarshal JSON: %v\n", err)
+		log.Fatalf("unmarshal JSON: %v", err)
 	}
 
 	// Normalize the JSON
@@ -41,7 +46,7 @@ func main() {
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(jsonData); err != nil {
-		log.Fatalf("marshal normalized JSON: %v\n", err)
+		log.Fatalf("marshal normalized JSON: %v", err)
 		return
 	}
 }

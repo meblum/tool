@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	xj "github.com/basgys/goxml2json"
+	"github.com/mattn/go-isatty"
 )
 
 // convert reads xml from r and encodes it as json to w
@@ -19,12 +20,16 @@ func convert(r io.Reader, w io.Writer) error {
 }
 
 func reader() io.ReadCloser {
-	if len(os.Args) == 1 {
+	istty := isatty.IsTerminal(os.Stdin.Fd()) || isatty.IsCygwinTerminal(os.Stdin.Fd())
+	if !istty {
 		return os.Stdin
+	}
+	if len(os.Args) < 2 {
+		log.Fatal("input not provided")
 	}
 	f, err := os.Open(strings.TrimSpace(os.Args[1]))
 	if err != nil {
-		log.Fatalf("open input file %q: %v", os.Args[1], err)
+		log.Fatalf("open file: %v", err)
 	}
 	return f
 }
