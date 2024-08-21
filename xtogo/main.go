@@ -4,9 +4,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 
-	"github.com/mattn/go-isatty"
+	"github.com/meblum/tool"
 	"github.com/twpayne/go-xmlstruct"
 )
 
@@ -32,24 +31,11 @@ func convert(r io.Reader, w io.Writer) {
 	}
 }
 
-func reader() io.ReadCloser {
-	istty := isatty.IsTerminal(os.Stdin.Fd()) || isatty.IsCygwinTerminal(os.Stdin.Fd())
-	if !istty {
-		return os.Stdin
-	}
-	if len(os.Args) < 2 {
+func main() {
+	r := tool.Reader()
+	if r == nil {
 		log.Fatal("input not provided")
 	}
-	f, err := os.Open(strings.TrimSpace(os.Args[1]))
-	if err != nil {
-		log.Fatalf("open file: %v", err)
-	}
-	return f
-}
-
-func main() {
-
-	r := reader()
 	defer func() {
 		if err := r.Close(); err != nil {
 			log.Fatalf("close input stream: %v", err)

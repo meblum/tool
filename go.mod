@@ -1,4 +1,4 @@
-module github.com/meblum/xson
+module github.com/meblum/tool
 
 go 1.22.5
 
