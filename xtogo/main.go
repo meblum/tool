@@ -12,6 +12,7 @@ import (
 func convert(r io.Reader, w io.Writer) {
 	g := xmlstruct.NewGenerator(
 		xmlstruct.WithPackageName(""),
+		xmlstruct.WithHeader(""),
 		xmlstruct.WithPackageName(""),
 		xmlstruct.WithImports(false),
 		xmlstruct.WithNamedRoot(true),
