@@ -13,12 +13,13 @@ func convert(r io.Reader, w io.Writer) {
 	g := xmlstruct.NewGenerator(
 		xmlstruct.WithPackageName(""),
 		xmlstruct.WithHeader(""),
-		xmlstruct.WithPackageName(""),
 		xmlstruct.WithImports(false),
 		xmlstruct.WithNamedRoot(true),
 		xmlstruct.WithNamedTypes(true),
 		xmlstruct.WithEmptyElements(false),
 		xmlstruct.WithTopLevelAttributes(true),
+		xmlstruct.WithCompactTypes(true),
+		xmlstruct.WithUsePointersForOptionalFields(false),
 	)
 	if err := g.ObserveReader(r); err != nil {
 		log.Fatalf("read input: %v", err)
